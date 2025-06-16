@@ -192,6 +192,7 @@ async function sendButtons(to, header, body, footer) {
       interactive: {
         type: 'button',
         header: {
+          type: 'text',
           text: header
         },
         body: {
