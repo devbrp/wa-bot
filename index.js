@@ -49,7 +49,7 @@ app.post('/webhook', async (req, res) => {
       const text = messages.text.body.toLowerCase();
 
       if (text === 'hola') {
-        sendButtons(to, 'Transportes Oscori srl.', 'Bienvenid@, de que empresa nos hablas', 'Selecciona una opción')
+        sendButtons(messages.from, 'Transportes Oscori srl.', 'Bienvenid@, de que empresa nos hablas', 'Selecciona una opción')
         //replyMessage(messages.from, 'Bienvenid@ a Transportes Oscori srl.', messages.id)
       }
 
