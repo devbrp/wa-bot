@@ -49,11 +49,11 @@ app.post('/webhook', async (req, res) => {
       const text = messages.text.body.toLowerCase();
 
       if (text === 'hola') {
-replyMessage(messages.from, '¡Hola! ¿Cómo estás?', messages.id)
+        replyMessage(messages.from, 'Bienvenid@ a Transportes Oscori srl.', messages.id)
       }
 
       if (text === 'menu') {
-        await sendButtons(from);
+        sendButtons(from);
       }
 
       if (text === 'lista') {
@@ -119,6 +119,64 @@ async function sendText(to, body) {
 }
 
 async function sendButtons(to) {
+  await axios({
+    url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
+    method: 'post',
+    headers: {
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        header: {
+          type: 'text',
+          text: 'Message Header'
+        },
+        body: {
+          text: 'This is a interactive list message'
+        },
+        footer: {
+          text: 'This is the message footer'
+        },
+        action: {
+          button: 'Tap for the options',
+          sections: [
+            {
+              title: 'First Section',
+              rows: [
+                {
+                  id: 'first_option',
+                  title: 'First option',
+                  description: 'This is the description of the first option'
+                },
+                {
+                  id: 'second_option',
+                  title: 'Second option',
+                  description: 'This is the description of the second option'
+                }
+              ]
+            },
+            {
+              title: 'Second Section',
+              rows: [
+                {
+                  id: 'third_option',
+                  title: 'Third option'
+                }
+              ]
+            }
+          ]
+        }
+      }
+    })
+  })
+}
+
+async function sendButtons2(to) {
   await axios.post(`https://graph.facebook.com/v22.0/${PHONE_ID}/messages`, {
     messaging_product: 'whatsapp',
     to,
