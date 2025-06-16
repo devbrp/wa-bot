@@ -5,6 +5,8 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
+const WHATSAPP_ACCESS_TOKEN = 'EAAIe5iFGKQUBOzeZCedaebsw3ZB9PvtZAPmj3muv2mvyZC6GyQZCkq9wzCR0wjNkLTC5F9cxCcZAE55aruzuLlO96mW2S8hDaMco2hSxFhJoloUtn2r6gfvDt5B3j6eXcZAyZAB6A08ZCTQqHBg2msrOtlZBhSagz93ZBvVUkhBS9WJmfwb8ywYTCB4TA3EObnX1eK6OqoVWPTeA7wtmCgFStJCPoXCx4wCvUR3TegZD'
+
 const {
   VERIFY_TOKEN,
   ACCESS_TOKEN,
@@ -77,7 +79,7 @@ async function replyMessage(to, body, messageId) {
     url: 'https://graph.facebook.com/v21.0/phone_number_id/messages',
     method: 'post',
     headers: {
-      'Authorization': `Bearer ${ACCESS_TOKEN}`,
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
       'Content-Type': 'application/json'
     },
     data: JSON.stringify({
@@ -99,7 +101,7 @@ async function sendText(to, body) {
     url: 'https://graph.facebook.com/v22.0/${PHONE_ID}/messages',
     method: 'post',
     headers: {
-      'Authorization': `Bearer ${ACCESS_TOKEN}`,
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
       'Content-Type': 'application/json'
     },
     data: JSON.stringify({
