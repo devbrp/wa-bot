@@ -54,7 +54,7 @@ app.post('/webhook', async (req, res) => {
       }
 
       if (text === 'menu') {
-        sendButtons(from);
+        sendButtonsSection(messages.from, 'Transportes Oscori srl.', 'Bienvenid@, de que empresa nos hablas', 'Presiona el boton', 'Selecciona una opción')
       }
 
       if (text === 'lista') {
@@ -147,26 +147,26 @@ async function sendButtonsSection(to, header, body, footer, textbuttons) {
           button: textbuttons,
           sections: [
             {
-              title: 'First Section',
+              title: 'Empresas de Bolivia',
               rows: [
                 {
                   id: 'first_option',
-                  title: 'First option',
-                  description: 'This is the description of the first option'
+                  title: 'COMPANEX',
+                  description: 'Esta es la primera empresa'
                 },
                 {
                   id: 'second_option',
-                  title: 'Second option',
-                  description: 'This is the description of the second option'
+                  title: 'LA PAPELERA',
+                  description: 'Esta es la segunda'
                 }
               ]
             },
             {
-              title: 'Second Section',
+              title: 'Empresas del Extrangero',
               rows: [
                 {
                   id: 'third_option',
-                  title: 'Third option'
+                  title: 'CHILE'
                 }
               ]
             }
@@ -190,9 +190,8 @@ async function sendButtons(to, header, body, footer) {
       to,
       type: 'interactive',
       interactive: {
-        type: 'list',
+        type: 'button',
         header: {
-          type: 'text',
           text: header
         },
         body: {
