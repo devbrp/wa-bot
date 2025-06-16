@@ -73,7 +73,7 @@ app.post('/webhook', async (req, res) => {
 });
 
 async function sendText(to, body) {
-  await axios.post(`https://graph.facebook.com/v18.0/${PHONE_ID}/messages`, {
+  await axios.post(`https://graph.facebook.com/v22.0/${PHONE_ID}/messages`, {
     messaging_product: 'whatsapp',
     to,
     type: 'text',
@@ -87,7 +87,7 @@ async function sendText(to, body) {
 }
 
 async function sendButtons(to) {
-  await axios.post(`https://graph.facebook.com/v18.0/${PHONE_ID}/messages`, {
+  await axios.post(`https://graph.facebook.com/v22.0/${PHONE_ID}/messages`, {
     messaging_product: 'whatsapp',
     to,
     type: 'interactive',
@@ -110,7 +110,7 @@ async function sendButtons(to) {
 }
 
 async function sendList(to) {
-  await axios.post(`https://graph.facebook.com/v18.0/${PHONE_ID}/messages`, {
+  await axios.post(`https://graph.facebook.com/v22.0/${PHONE_ID}/messages`, {
     messaging_product: 'whatsapp',
     to,
     type: 'interactive',
