@@ -18,6 +18,8 @@ app.get('/', (req, res) => {
   res.send('WhatsApp Bot funcionando');
 });
 
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
+
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -49,13 +51,73 @@ app.post('/webhook', async (req, res) => {
       const text = messages.text.body.toLowerCase();
 
       if (text === 'hola') {
-        sendButtons(messages.from, 'Transportes Oscori srl.', 'Bienvenid@, de que empresa nos hablas', 'Selecciona una opción')
-        //replyMessage(messages.from, 'Bienvenid@ a Transportes Oscori srl.', messages.id)
+        replyMessage(messages.from, 'Respuesta a tu pregunta', messages.id)
       }
 
-      if (text === 'menu') {
-        sendButtonsSection(messages.from, 'Transportes Oscori srl.', 'Bienvenid@, de que empresa nos hablas', 'Presiona el boton', 'Selecciona una opción')
+      if(text === '1'){
+      const botones = [
+            { type: 'reply', reply: { id: 'opt1', title: 'IMPORTACIÓN' } },
+            { type: 'reply', reply: { id: 'opt2', title: 'EXPORTACIÓN' } }
+          ];
+        sendButtons(messages.from, 'Transportes Oscori srl.', 'Bienvenid@, Que necesitas?', '', botones)
       }
+      if(text === '2'){
+        const botones = [
+            { type: 'reply', reply: { id: 'opt1', title: 'ARICA' } },
+            { type: 'reply', reply: { id: 'opt2', title: 'IQUIQUE' } }
+          ];
+        sendButtons(messages.from, 'Transportes Oscori srl.', 'Lugar de carga o destino', '', botones)
+      }
+      if(text === '3'){
+        const botones = [
+            { type: 'reply', reply: { id: 'opt1', title: '20"' } },
+            { type: 'reply', reply: { id: 'opt2', title: '40"' } },
+            { type: 'reply', reply: { id: 'opt3', title: '40" Refrigerador' } }
+          ];
+        sendButtons(messages.from, 'Transportes Oscori srl.', 'Tamaño de Contenedor', '', botones)
+      }
+      if (text === '4') {
+        const opciones = [
+            {
+              title: 'NAVIERAS',
+              rows: [
+                {
+                  id: 'opt1',
+                  title: 'MSC'
+                  //description: 'Esta es la primera empresa'
+                },
+                {
+                  id: 'opt2',
+                  title: 'Maersk',
+                },
+                {
+                  id: 'opt3',
+                  title: 'HAPAG LLOYD',
+                },
+                {
+                  id: 'opt4',
+                  title: 'Cosco',
+                },
+                {
+                  id: 'opt5',
+                  title: 'ONE',
+                },
+                {
+                  id: 'opt6',
+                  title: 'MSL',
+                }
+              ]
+            }
+          ]
+        sendButtonsSection(messages.from, 'Transportes Oscori srl.', 'En que naviera', '', 'NAVIERAS', opciones)
+      }
+      if(text === '5'){
+        sendImage(messages.from)
+      }
+      if(text === '6'){
+        sendText(from, `Peso`, messages.id);
+      }
+      
 
       if (text === 'lista') {
         await sendList(from);
@@ -65,8 +127,9 @@ app.post('/webhook', async (req, res) => {
     if (msgType === 'interactive') {
       const reply = messages.interactive?.button_reply || messages.interactive?.list_reply;
       if (reply) {
-        await sendText(from, `Seleccionaste: ${reply.title}`);
+        await sendText(from, `Seleccionaste: ${reply.title}`, messages.id);
       }
+      console.log(JSON.stringify(messages, null, 2));
     }
 
     console.log(JSON.stringify(messages, null, 2));
@@ -74,6 +137,58 @@ app.post('/webhook', async (req, res) => {
 
   res.sendStatus(200);
 });
+
+async function sendButtons(to, header, body, footer, botones) {
+  await axios({
+    url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
+    method: 'post',
+    headers: {
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        header: {
+          type: 'image',
+          text: 'https://wa-bot-g6h9.onrender.com/images/header.jpeg'
+        },
+        body: {
+          text: body
+        },
+        footer: {
+          text: footer
+        },
+        action: {
+          buttons: botones
+        }
+      }
+    })
+  })
+}
+
+async function sendImage(to) {
+  await axios({
+    url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
+    method: 'post',
+    headers: {
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify({
+      messaging_product: "whatsapp",
+      to,
+      type: "image",
+      image: {
+        link: 'https://wa-bot-g6h9.onrender.com/images/header.jpeg',
+        caption: 'IMAGEN DE PRUEBA'
+      }
+    })
+  })
+}
 
 async function replyMessage(to, body, messageId) {
   await axios({
@@ -85,6 +200,7 @@ async function replyMessage(to, body, messageId) {
     },
     data: JSON.stringify({
       messaging_product: 'whatsapp',
+      recipient_type: 'individual',
       to,
       type: 'text',
       text: {
@@ -97,7 +213,7 @@ async function replyMessage(to, body, messageId) {
   })
 }
 
-async function sendText(to, body) {
+async function sendText(to, body, messageId) {
   await axios({
     url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
     method: 'post',
@@ -119,7 +235,7 @@ async function sendText(to, body) {
   })
 }
 
-async function sendButtonsSection(to, header, body, footer, textbuttons) {
+async function sendButtonsSection(to, header, body, footer, textbuttons, secciones) {
   await axios({
     url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
     method: 'post',
@@ -145,39 +261,14 @@ async function sendButtonsSection(to, header, body, footer, textbuttons) {
         },
         action: {
           button: textbuttons,
-          sections: [
-            {
-              title: 'Empresas de Bolivia',
-              rows: [
-                {
-                  id: 'first_option',
-                  title: 'COMPANEX',
-                  description: 'Esta es la primera empresa'
-                },
-                {
-                  id: 'second_option',
-                  title: 'LA PAPELERA',
-                  description: 'Esta es la segunda'
-                }
-              ]
-            },
-            {
-              title: 'Empresas del Extrangero',
-              rows: [
-                {
-                  id: 'third_option',
-                  title: 'CHILE'
-                }
-              ]
-            }
-          ]
+          sections: secciones
         }
       }
     })
   })
 }
 
-async function sendButtons(to, header, body, footer) {
+async function sendButtons(to, header, body, footer, botones) {
   await axios({
     url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
     method: 'post',
@@ -202,37 +293,11 @@ async function sendButtons(to, header, body, footer) {
           text: footer
         },
         action: {
-          buttons: [
-            { type: 'reply', reply: { id: 'opt1', title: 'LA PAPELERA' } },
-            { type: 'reply', reply: { id: 'opt2', title: 'COMPANEX' } }
-          ]
+          buttons: botones
         }
       }
     })
   })
-}
-
-async function sendButtons2(to) {
-  await axios.post(`https://graph.facebook.com/v22.0/${PHONE_ID}/messages`, {
-    messaging_product: 'whatsapp',
-    to,
-    type: 'interactive',
-    interactive: {
-      type: 'button',
-      body: { text: 'Elige una opción:' },
-      action: {
-        buttons: [
-          { type: 'reply', reply: { id: 'opt1', title: 'Productos' } },
-          { type: 'reply', reply: { id: 'opt2', title: 'Asesor' } }
-        ]
-      }
-    }
-  }, {
-    headers: {
-      Authorization: `Bearer ${ACCESS_TOKEN}`,
-      'Content-Type': 'application/json'
-    }
-  });
 }
 
 async function sendList(to) {
@@ -262,6 +327,53 @@ async function sendList(to) {
     headers: {
       Authorization: `Bearer ${ACCESS_TOKEN}`,
       'Content-Type': 'application/json'
+    }
+  });
+}
+
+async function sendFlowMessage(to, messageId, flowParams) {
+  await axios({
+    url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
+    method: 'post',
+    headers: {
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    data: {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to,
+      type: 'interactive',
+      context: {
+        message_id: messageId
+      },
+      interactive: {
+        type: 'flow',
+        header: {
+          type: 'text',
+          text: flowParams.header || 'Flow message header'
+        },
+        body: {
+          text: flowParams.body || 'Flow message body'
+        },
+        footer: {
+          text: flowParams.footer || 'Flow message footer'
+        },
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            flow_token: flowParams.flow_token,
+            flow_id: flowParams.flow_id,
+            flow_cta: flowParams.flow_cta || 'Continuar',
+            flow_action: flowParams.flow_action || 'navigate',
+            flow_action_payload: {
+              screen: flowParams.screen,
+              data: flowParams.data
+            }
+          }
+        }
+      }
     }
   });
 }
