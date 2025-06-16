@@ -77,7 +77,7 @@ async function replyMessage(to, body, messageId) {
     url: 'https://graph.facebook.com/v21.0/phone_number_id/messages',
     method: 'post',
     headers: {
-      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+      'Authorization': `Bearer ${ACCESS_TOKEN}`,
       'Content-Type': 'application/json'
     },
     data: JSON.stringify({
@@ -99,7 +99,7 @@ async function sendText(to, body) {
     url: 'https://graph.facebook.com/v22.0/${PHONE_ID}/messages',
     method: 'post',
     headers: {
-      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+      'Authorization': `Bearer ${ACCESS_TOKEN}`,
       'Content-Type': 'application/json'
     },
     data: JSON.stringify({
