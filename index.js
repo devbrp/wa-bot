@@ -49,7 +49,8 @@ app.post('/webhook', async (req, res) => {
       const text = messages.text.body.toLowerCase();
 
       if (text === 'hola') {
-        replyMessage(messages.from, 'Bienvenid@ a Transportes Oscori srl.', messages.id)
+        sendButtons(to, 'Transportes Oscori srl.', 'Bienvenid@, de que empresa nos hablas', 'Selecciona una opción')
+        //replyMessage(messages.from, 'Bienvenid@ a Transportes Oscori srl.', messages.id)
       }
 
       if (text === 'menu') {
@@ -118,7 +119,7 @@ async function sendText(to, body) {
   })
 }
 
-async function sendButtons(to) {
+async function sendButtonsSection(to, header, body, footer, textbuttons) {
   await axios({
     url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
     method: 'post',
@@ -134,16 +135,16 @@ async function sendButtons(to) {
         type: 'list',
         header: {
           type: 'text',
-          text: 'Message Header'
+          text: header
         },
         body: {
-          text: 'This is a interactive list message'
+          text: body
         },
         footer: {
-          text: 'This is the message footer'
+          text: footer
         },
         action: {
-          button: 'Tap for the options',
+          button: textbuttons,
           sections: [
             {
               title: 'First Section',
@@ -169,6 +170,41 @@ async function sendButtons(to) {
                 }
               ]
             }
+          ]
+        }
+      }
+    })
+  })
+}
+
+async function sendButtons(to, header, body, footer) {
+  await axios({
+    url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
+    method: 'post',
+    headers: {
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        header: {
+          type: 'text',
+          text: header
+        },
+        body: {
+          text: body
+        },
+        footer: {
+          text: footer
+        },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: 'opt1', title: 'LA PAPELERA' } },
+            { type: 'reply', reply: { id: 'opt2', title: 'COMPANEX' } }
           ]
         }
       }
