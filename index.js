@@ -76,7 +76,7 @@ replyMessage(messages.from, '¡Hola! ¿Cómo estás?', messages.id)
 
 async function replyMessage(to, body, messageId) {
   await axios({
-    url: 'https://graph.facebook.com/v21.0/phone_number_id/messages',
+    url: 'https://graph.facebook.com/v22.0/${PHONE_ID}/messages',
     method: 'post',
     headers: {
       'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
