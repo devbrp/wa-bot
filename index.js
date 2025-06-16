@@ -47,7 +47,7 @@ app.post('/webhook', async (req, res) => {
       const text = messages.text.body.toLowerCase();
 
       if (text === 'hola') {
-        await sendText(from, '¡Hola! ¿Cómo estás?');
+replyMessage(messages.from, '¡Hola! ¿Cómo estás?', messages.id)
       }
 
       if (text === 'menu') {
@@ -72,18 +72,48 @@ app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
 });
 
-async function sendText(to, body) {
-  await axios.post(`https://graph.facebook.com/v22.0/${PHONE_ID}/messages`, {
-    messaging_product: 'whatsapp',
-    to,
-    type: 'text',
-    text: { body }
-  }, {
+async function replyMessage(to, body, messageId) {
+  await axios({
+    url: 'https://graph.facebook.com/v21.0/phone_number_id/messages',
+    method: 'post',
     headers: {
-      Authorization: `Bearer ${ACCESS_TOKEN}`,
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
       'Content-Type': 'application/json'
-    }
-  });
+    },
+    data: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'text',
+      text: {
+        body
+      },
+      context: {
+        message_id: messageId
+      }
+    })
+  })
+}
+
+async function sendText(to, body) {
+  await axios({
+    url: 'https://graph.facebook.com/v22.0/${PHONE_ID}/messages',
+    method: 'post',
+    headers: {
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'text',
+      text: {
+        body
+      },
+      context: {
+        message_id: messageId
+      }
+    })
+  })
 }
 
 async function sendButtons(to) {
