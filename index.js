@@ -165,7 +165,7 @@ async function subirImagen() {
     form,
     {
       headers: {
-        Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+        Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
         ...form.getHeaders()
       }
     }
