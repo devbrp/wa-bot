@@ -123,7 +123,15 @@ app.post('/webhook', async (req, res) => {
             { type: 'reply', reply: { id: 'opt1', title: 'IMPORTACIÓN' } },
             { type: 'reply', reply: { id: 'opt2', title: 'EXPORTACIÓN' } }
           ];
-        sendButtonsImage(messages.from, 'Transportes Oscori srl.', 'Bienvenid@, Que necesitas?', '', botones)
+          (async () => {
+      try {
+    const mediaId = await subirImagen();
+    await sendButtonsImage(messages.from, 'Transportes Oscori srl.', 'Bienvenid@, ¿Qué necesitas?', '', mediaId, botones);
+  } catch (err) {
+    console.error('❌ Error al enviar mensaje con imagen:', err.response?.data || err.message);
+  }
+      })();
+        
       }      
 
       if (text === 'lista') {
@@ -145,7 +153,28 @@ app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
 });
 
-async function sendButtonsImage(to, header, body, footer, botones) {
+async function subirImagen() {
+  const form = new FormData();
+  form.append('file', fs.createReadStream(path.join(__dirname, 'public/images/header.jpeg')));
+  form.append('type', 'image/jpeg');
+  form.append('messaging_product', 'whatsapp');
+
+  const response = await axios.post(
+    `https://graph.facebook.com/v22.0/${PHONE_ID}/media`,
+    form,
+    {
+      headers: {
+        Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+        ...form.getHeaders()
+      }
+    }
+  );
+
+  console.log('MEDIA ID:', response.data.id);
+  return response.data.id;
+}
+
+async function sendButtonsImage(to, header, body, footer,mediaId, botones) {
   await axios({
     url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
     method: 'post',
@@ -162,7 +191,7 @@ async function sendButtonsImage(to, header, body, footer, botones) {
         header: {
           type: 'image',
           image: {
-            link: 'https://wa-bot-g6h9.onrender.com/images/header.jpeg'
+            id: mediaId
           }
         },
         body: {
