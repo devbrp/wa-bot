@@ -118,7 +118,13 @@ app.post('/webhook', async (req, res) => {
       if(text === '6'){
         sendText(from, `Peso`, messages.id);
       }
-      
+      if(text === '7'){
+        const botones = [
+            { type: 'reply', reply: { id: 'opt1', title: 'IMPORTACIÓN' } },
+            { type: 'reply', reply: { id: 'opt2', title: 'EXPORTACIÓN' } }
+          ];
+        sendButtonsImage(messages.from, 'Transportes Oscori srl.', 'Bienvenid@, Que necesitas?', '', botones)
+      }      
 
       if (text === 'lista') {
         await sendList(from);
@@ -138,6 +144,40 @@ app.post('/webhook', async (req, res) => {
 
   res.sendStatus(200);
 });
+
+async function sendButtonsImage(to, header, body, footer, botones) {
+  await axios({
+    url: `https://graph.facebook.com/v22.0/${PHONE_ID}/messages`,
+    method: 'post',
+    headers: {
+      'Authorization': `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        header: {
+          type: 'image',
+          image: {
+            link: 'https://wa-bot-g6h9.onrender.com/images/header.jpeg'
+          }
+        },
+        body: {
+          text: body
+        },
+        footer: {
+          text: footer
+        },
+        action: {
+          buttons: botones
+        }
+      }
+    })
+  })
+}
 
 async function sendButtons(to, header, body, footer, botones) {
   await axios({
