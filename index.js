@@ -3,11 +3,11 @@ const express = require('express');
 const path = require('path');
 const axios = require('axios');
 const fs = require('fs');
-
+const FormData = require('form-data');
 const app = express();
 app.use(express.json());
 
-const WHATSAPP_ACCESS_TOKEN = 'EAAIe5iFGKQUBO2taDw3hLm4U4omr1IJcUNRRe5NSriabfrIT8wYqEooUESxbQrzLK4WfZAlOwTSPNgV7kZCzxFUQLwb9wSCcDwZCFfxqzzGmx14ohxuuPRVEWsgvY9ZAnfSQ76pV4QO1QIguRkXc5l9V9sX6a6LuZBUXsuNUlr40L7TieEiyUS9cZACtr0mudfHLfB2udSLzAZD'
+const WHATSAPP_ACCESS_TOKEN = 'EAAIe5iFGKQUBO6xwV3Y6x3y7EWJkvPMBPiDUMs7FZC7vDnge1pfAZC4YI7CIGf5ZBVGmUzZBv2TKUsjuDbhjDXK48ZCS4Q3RvOFoJLmAlqU17ZB2waf6zJouGeE7omeZCy9jqSxAMcDcq8hpzZCNVHVtDzF2biTTuK3ZBYd4mk3LzGr6dxqLSA8GoxAem99pbLOZCkI0b0asvlCPEZD'
 
 const {
   VERIFY_TOKEN,
@@ -39,6 +39,7 @@ app.post('/webhook', async (req, res) => {
   const changes = entry?.changes?.[0]?.value;
 
   const messages = changes?.messages?.[0];
+  const nombreUsuario = changes?.contacts?.[0]?.profile?.name || 'usuario';
   const statuses = changes?.statuses?.[0];
 
   if (statuses) {
@@ -56,12 +57,290 @@ app.post('/webhook', async (req, res) => {
         replyMessage(messages.from, 'Respuesta a tu pregunta', messages.id)
       }
 
+      const text1 = '¿Desde qué ciudad en Chile quieres traer tu carga?'
+      const opciones1 = [
+          {
+            title: 'NAVIERAS',
+            rows: [
+              {
+                id: 'opt1',
+                title: 'Iquique'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Arica',
+              },
+              {
+                id: 'opt3',
+                title: 'Santiago',
+              },
+              {
+                id: 'opt4',
+                title: 'Otra ciudad',
+              }
+            ]
+          }
+      ] 
+
+      const text2 = '¿Dónde deseas que entreguemos en Bolivia?'
+      const opciones2 = [
+          {
+            title: 'BOLIVIA',
+            rows: [
+              {
+                id: 'opt1',
+                title: 'La Paz'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Santa Cruz',
+              },
+              {
+                id: 'opt3',
+                title: 'Cochabamba',
+              },
+              {
+                id: 'opt4',
+                title: 'Otras ciudades',
+              }
+            ]
+          }
+      ] 
+
+      const text3 = '¿Cómo viene tu carga?'
+      const opciones3 = [
+          {
+            title: 'BOLIVIA',
+            rows: [
+              {
+                id: 'opt1',
+                title: 'Carga suelta (paquetes, palets, cajas sueltas)'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Contenedor completo (20 pies / 40 pies)',
+              }            
+            ]
+          }
+      ] 
+      const text4 = `¿Sabes el peso o volumen aproximado? \n
+      > Ejemplo: 500 kg / 3 m³`
+
+      const text5 = '¿Qué tipo de contenedor estás usando?'
+      const opciones5 = [
+          {
+            title: 'Opciones',
+            rows: [
+              {
+                id: 'opt1',
+                title: '20 pies estándar'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: '40 pies estándar',
+              },
+              {
+                id: 'opt1',
+                title: '40 pies high cube'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: '20 pies refrigerador',
+              },
+              {
+                id: 'opt2',
+                title: '40 pies refrigerador',
+              }               
+            ]
+          }
+      ]
+      
+      const text6 = `Peso de carga en contenedor de 20 pies \n
+      Recuerda que el peso total permitido para el transporte en contenedor de 20 pies es de máximo 26 toneladas, incluyendo la tara del contenedor (2,2 toneladas). \n
+      *¿Cuál es el peso aproximado solo de tu carga?*`
+      const opciones6 = [
+          {
+            title: 'Opciones',
+            rows: [
+              {
+                id: 'opt1',
+                title: 'Menos de 10 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 10 y 15 toneladas',
+              },
+              {
+                id: 'opt1',
+                title: 'Entre 15 y 20 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 20 y 23,8 toneladas (límite máximo permitido)',
+              },
+              {
+                id: 'opt2',
+                title: 'Más de 24 toneladas',
+              }               
+            ]
+          }
+      ]
+
+      const text7 = `Peso de carga en contenedor de 40 pies \n
+      Para el contenedor de 40 pies, el peso máximo total permitido es de 28 toneladas, incluyendo la tara del contenedor (3,8 toneladas). \n
+      Esto significa que tu carga no debe superar los 24,2 toneladas.\n
+      *¿Cuál es el peso aproximado solo de tu carga?*`
+      const opciones7 = [
+          {
+            title: 'Opciones',
+            rows: [
+              {
+                id: 'opt1',
+                title: 'Menos de 10 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 10 y 15 toneladas',
+              },
+              {
+                id: 'opt1',
+                title: 'Entre 15 y 20 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 20 y 24,2 toneladas (límite máximo permitido)',
+              },
+              {
+                id: 'opt2',
+                title: 'Más de 24 toneladas',
+              }               
+            ]
+          }
+      ]
+
+      const text8 = `Contenedor Reefer de 20 pies \n
+      El peso total máximo permitido para un contenedor refrigerado de 20 pies es de 26 toneladas, incluyendo la tara del equipo. \n
+      Tara aproximada: 3.0 toneladas\n
+      Carga útil máxima: hasta 23 toneladas \n
+      *¿Cuál es el peso aproximado solo de tu carga?*`
+      const opciones8 = [
+          {
+            title: 'Opciones',
+            rows: [
+              {
+                id: 'opt1',
+                title: 'Menos de 10 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 10 y 15 toneladas',
+              },
+              {
+                id: 'opt1',
+                title: 'Entre 15 y 20 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 20 y 24,2 toneladas (límite máximo permitido)',
+              },
+              {
+                id: 'opt2',
+                title: 'Más de 24 toneladas',
+              }               
+            ]
+          }
+      ]
+
+      const text9 = `Contenedor Reefer de 20 pies \n
+      El peso total máximo permitido para un contenedor refrigerado de 20 pies es de 26 toneladas, incluyendo la tara del equipo. \n
+      Tara aproximada: 3.0 toneladas\n
+      Carga útil máxima: hasta 23 toneladas \n
+      *¿Cuál es el peso aproximado solo de tu carga?*`
+      const opciones9 = [
+          {
+            title: 'Opciones',
+            rows: [
+              {
+                id: 'opt1',
+                title: 'Menos de 10 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 10 y 15 toneladas',
+              },
+              {
+                id: 'opt1',
+                title: 'Entre 15 y 20 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 20 y 23 toneladas (límite máximo permitido)',
+              },
+              {
+                id: 'opt2',
+                title: 'Más de 23 toneladas',
+              }               
+            ]
+          }
+      ]
+
+const text10 = `Contenedor Reefer de 40 pies \n
+      El peso total máximo permitido para un contenedor refrigerado de 40 pies es de 28 toneladas, incluyendo la tara. \n
+      Tara aproximada: 4.5 toneladas\n
+      Carga útil máxima: hasta 23.5 toneladas \n
+      *¿Cuál es el peso aproximado solo de tu carga?*`
+      const opciones10 = [
+          {
+            title: 'Opciones',
+            rows: [
+              {
+                id: 'opt1',
+                title: 'Menos de 10 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 10 y 15 toneladas',
+              },
+              {
+                id: 'opt1',
+                title: 'Entre 15 y 20 toneladas'
+                //description: 'Esta es la primera empresa'
+              },
+              {
+                id: 'opt2',
+                title: 'Entre 20 y 23.5 toneladas (máximo permitido)',
+              },
+              {
+                id: 'opt2',
+                title: 'Más de 23.5 toneladas',
+              }               
+            ]
+          }
+      ]
+
       if(text === '1'){
+      const mensaje = `Estimad@ ${nombreUsuario} 👋\n
+                    Gracias por comunicarte con nosotros.\n
+                    ¿En qué podemos ayudarte hoy?`;
       const botones = [
-            { type: 'reply', reply: { id: 'opt1', title: 'IMPORTACIÓN' } },
-            { type: 'reply', reply: { id: 'opt2', title: 'EXPORTACIÓN' } }
+            { type: 'reply', reply: { id: 'import', title: 'IMPORTACIÓN' } },
+            { type: 'reply', reply: { id: 'export', title: 'EXPORTACIÓN' } }
           ];
-        sendButtons(messages.from, 'Transportes Oscori srl.', 'Bienvenid@, Que necesitas?', '', botones)
+        sendButtons(messages.from, 'Transportes Oscori srl.', mensaje, '', botones)
       }
       if(text === '2'){
         const botones = [
@@ -144,6 +423,34 @@ app.post('/webhook', async (req, res) => {
       const reply = messages.interactive?.button_reply || messages.interactive?.list_reply;
       if (reply) {
         await sendText(from, `Seleccionaste: ${reply.title}`, messages.id);
+
+        const selectedId = reply.id;
+
+        switch (selectedId) {
+          case 'flujo_importacion':
+            await sendText(from, 'Iniciando flujo de IMPORTACIÓN...', messages.id);
+            // Aquí puedes enviar más preguntas, imágenes, etc.
+            break;
+
+          case 'flujo_exportacion':
+            await sendText(from, 'Iniciando flujo de EXPORTACIÓN...', messages.id);
+            // Puedes continuar el flujo según lo que elijas
+            break;
+
+          case 'opt1':
+            await sendText(from, 'Elegiste opción 1', messages.id);
+            break;
+
+          case 'opt2':
+            await sendText(from, 'Elegiste opción 2', messages.id);
+            break;
+
+          // Puedes seguir agregando más casos
+
+          default:
+            await sendText(from, `No reconozco esta opción: ${selectedId}`, messages.id);
+            break;
+        }
       }
       console.log(JSON.stringify(messages, null, 2));
     }
