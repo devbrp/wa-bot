@@ -220,7 +220,7 @@ function consulta(messages) {
   const mensaje = `Estimad@ ${nombreUsuario} 👋\nSeleccione en qué mas podemos ayudarte?`;
   const botones = [
     { type: 'reply', reply: { id: 'I_0', title: 'IMPORTACIÓN' } },
-    { type: 'reply', reply: { id: 'E_0', title: 'EXPORTACIÓN' } }
+    { type: 'reply', reply: { id: 'E_0', title: 'EXPORTACIÓN' } },
   ];
   sendButtons(messages.from, 'Transportes Oscori srl.', mensaje, '', botones)
 }
@@ -393,10 +393,10 @@ function carga(messages) {
 }
 
 function peso(messages) {
-  const text4 = `¿Sabes el peso o volumen aproximado? \n
+  const text = `¿Sabes el peso o volumen aproximado? \n
       > Ejemplo: 500 kg / 3 m³`
   // sendText(from, `Peso`, messages.id);
-  replyMessage(messages.from, 'Respuesta a tu pregunta', messages.id)
+  replyMessage(messages.from, text, messages.id)
 }
 
 function tipo_contenedor(messages) {
