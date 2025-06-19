@@ -208,9 +208,7 @@ async function cargarImagenes(messages) {
 
 
 function bienvenida(messages, nombreUsuario) {
-  const mensaje = `Estimad@ ${nombreUsuario} 👋\n
-                    Gracias por comunicarte con nosotros.\n
-                    ¿En qué podemos ayudarte hoy?`;
+  const mensaje = `Estimad@ ${nombreUsuario} 👋\nGracias por comunicarte con nosotros.\n¿En qué podemos ayudarte hoy?`;
   const botones = [
     { type: 'reply', reply: { id: 'I_0', title: 'IMPORTACIÓN' } },
     { type: 'reply', reply: { id: 'E_0', title: 'EXPORTACIÓN' } }
@@ -219,8 +217,7 @@ function bienvenida(messages, nombreUsuario) {
 }
 
 function consulta(messages) {
-  const mensaje = `Estimad@ ${nombreUsuario} 👋\n
-                    Seleccione en qué mas podemos ayudarte?`;
+  const mensaje = `Estimad@ ${nombreUsuario} 👋\nSeleccione en qué mas podemos ayudarte?`;
   const botones = [
     { type: 'reply', reply: { id: 'I_0', title: 'IMPORTACIÓN' } },
     { type: 'reply', reply: { id: 'E_0', title: 'EXPORTACIÓN' } }
@@ -381,12 +378,13 @@ function carga(messages) {
       rows: [
         {
           id: 'C_1',
-          title: 'Carga suelta (paquetes, palets, cajas sueltas)'
-          //description: 'Esta es la primera empresa'
+          title: 'Carga suelta',
+          description: '(paquetes, palets, cajas sueltas)'
         },
         {
           id: 'C_2',
-          title: 'Contenedor completo (20 pies / 40 pies)',
+          title: 'Contenedor completo',
+          description: '(20 pies / 40 pies)'
         }
       ]
     }
@@ -459,7 +457,8 @@ function contenedor_20pi(messages) {
         },
         {
           id: 'C_C_1_4',
-          title: 'Entre 20 y 23,8 toneladas (límite máximo permitido)',
+          title: 'De 20 a 23,8 toneladas',
+          description: '(límite máximo permitido)'
         },
         {
           id: 'C_C_1_5',
@@ -495,7 +494,8 @@ function contenedor_40pi(messages) {
         },
         {
           id: 'C_C_2_4',
-          title: 'Entre 20 y 24,2 toneladas (límite máximo permitido)',
+          title: 'De 20 a 24,2 toneladas',
+          description: '(límite máximo permitido)'
         },
         {
           id: 'C_C_2_5',
@@ -533,7 +533,8 @@ function contenedor_refer_20pi(messages) {
         },
         {
           id: 'C_C_3_4',
-          title: 'Entre 20 y 24,2 toneladas (límite máximo permitido)',
+          title: 'De 20 a 24,2 toneladas',
+          description: '(límite máximo permitido)'
         },
         {
           id: 'C_C_3_5',
@@ -571,7 +572,8 @@ function contenedor_refer_40pi(messages) {
         },
         {
           id: 'C_C_4_4',
-          title: 'Entre 20 y 23.5 toneladas (máximo permitido)',
+          title: 'De 20 a 23.5 toneladas',
+          description: '(máximo permitido)'
         },
         {
           id: 'C_C_4_5',
